@@ -21,7 +21,10 @@
               "apps/friends/src/favicon.ico",
               "apps/friends/src/assets"
             ],
-            "styles": ["apps/friends/src/styles.scss"],
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
+              "apps/friends/src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -148,7 +151,8 @@
       "unitTestRunner": "jest"
     },
     "@nrwl/angular:component": {
-      "style": "scss"
+      "style": "scss",
+      "changeDetection": "OnPush"
     }
   },
   "defaultProject": "friends"
