@@ -4,7 +4,6 @@ import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { addFriend, deleteFriend, fetchFriends } from './store/friends.actions';
-import { FriendsState } from './store/friends.reducer';
 import { selectFriends } from './store/friends.selectors';
 
 @Component({
@@ -18,7 +17,7 @@ export class FriendsContainerComponent implements OnInit {
     select(selectFriends),
     tap((friends) => console.log(friends))
   );
-  constructor(private friendsStore: Store<FriendsState>) {}
+  constructor(private friendsStore: Store<Friend[]>) {}
 
   ngOnInit(): void {
     this.friendsStore.dispatch(fetchFriends());

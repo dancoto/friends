@@ -1,3 +1,4 @@
+import { Friend } from '@dancoto/types';
 import { v4 as uuidv4 } from 'uuid';
 import {
   addFriendSuccess,
@@ -30,9 +31,7 @@ describe('FriendsReducer', () => {
           id: uuidv4(),
         },
       ];
-      const newState: fromReducer.FriendsState = {
-        friends: friends,
-      };
+      const newState: Friend[] = friends;
       const action = fetchFriendsSuccess({ friends });
       const state = fromReducer.friendsReducer(initialState, action);
 
@@ -53,9 +52,7 @@ describe('FriendsReducer', () => {
         id: id,
       };
 
-      const newState: fromReducer.FriendsState = {
-        friends: [friend],
-      };
+      const newState: Friend[] = [friend];
       const action = addFriendSuccess({ friend });
       const state = fromReducer.friendsReducer(initialState, action);
 
@@ -75,13 +72,9 @@ describe('FriendsReducer', () => {
         id: id,
       };
 
-      const existingState: fromReducer.FriendsState = {
-        friends: [friend],
-      };
+      const existingState: Friend[] = [friend];
 
-      const newState: fromReducer.FriendsState = {
-        friends: [],
-      };
+      const newState: Friend[] = [];
       const action = deleteFriendSuccess({ id });
       const state = fromReducer.friendsReducer(existingState, action);
 

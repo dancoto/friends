@@ -5,31 +5,19 @@ import {
   deleteFriendSuccess,
   fetchFriendsSuccess,
 } from './friends.actions';
-
-export interface FriendsState {
-  friends: Friend[];
-}
-
-export const initialState: FriendsState = {
-  friends: [],
-};
+// Ideally if this feature had more, we would have a proper feature object for more
+// properties in here, but since just friends, leaving it as an array
+export const initialState: Friend[] = [];
 
 const _friendsReducer = createReducer(
   initialState,
-  on(fetchFriendsSuccess, (state, { friends }) => ({
-    ...state,
-    friends: [...friends],
-  })),
-  on(addFriendSuccess, (state, { friend }) => ({
-    ...state,
-    friends: [...state.friends, friend],
-  })),
-  on(deleteFriendSuccess, (state, { id }) => ({
-    ...state,
-    friends: state.friends.filter((friend) => friend.id !== id),
-  }))
+  on(fetchFriendsSuccess, (state, { friends }) => [...friends]),
+  on(addFriendSuccess, (state, { friend }) => [...state, friend]),
+  on(deleteFriendSuccess, (state, { id }) =>
+    state.filter((friend) => friend.id !== id)
+  )
 );
 
-export function friendsReducer(state: FriendsState, action: Action) {
+export function friendsReducer(state: Friend[], action: Action) {
   return _friendsReducer(state, action);
 }
