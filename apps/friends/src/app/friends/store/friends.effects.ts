@@ -23,7 +23,7 @@ export class FriendsEffects {
       mergeMap(() =>
         this.friendsService.fetchFriends().pipe(
           map((friends) => fetchFriendsSuccess({ friends })),
-          catchError(() => of(fetchFriendsError))
+          catchError(() => of(fetchFriendsError()))
         )
       )
     )
@@ -35,12 +35,11 @@ export class FriendsEffects {
       mergeMap(({ friend }) =>
         this.friendsService.addFriend(friend).pipe(
           map((id) =>
-            // In case we get a null as an ID, return addFriendError
             !!id
               ? addFriendSuccess({ friend: { ...friend, id } })
               : addFriendError()
           ),
-          catchError(() => of(addFriendError))
+          catchError(() => of(addFriendError()))
         )
       )
     )
@@ -54,7 +53,7 @@ export class FriendsEffects {
           map((success) =>
             success ? deleteFriendSuccess({ id }) : deleteFriendError()
           ),
-          catchError(() => of(deleteFriendError))
+          catchError(() => of(deleteFriendError()))
         )
       )
     )

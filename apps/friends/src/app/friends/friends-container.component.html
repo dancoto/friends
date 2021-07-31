@@ -5,7 +5,11 @@
     <li>Friends: {{ friend.friends }}</li>
     <li>Age: {{ friend.age }}</li>
     <li>Weight: {{ friend.weight }}</li>
-    <button mat-raised-button color="primary" (click)="deleteFriend(friend.id)">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="deleteFriendById(friend.id!)"
+    >
       Delete
     </button>
   </ul>

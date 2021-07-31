@@ -25,7 +25,7 @@ export class FriendsContainerComponent implements OnInit {
     this.friendsStore.dispatch(addFriend({ friend }));
   }
 
-  deleteFriend(id: string) {
+  deleteFriendById(id: string) {
     this.friendsStore.dispatch(deleteFriend({ id }));
   }
 }
