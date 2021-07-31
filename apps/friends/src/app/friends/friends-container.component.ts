@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Friend } from '@dancoto/types';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
 import { addFriend, deleteFriend, fetchFriends } from './store/friends.actions';
 import { selectFriends } from './store/friends.selectors';
 
@@ -14,8 +13,7 @@ import { selectFriends } from './store/friends.selectors';
 })
 export class FriendsContainerComponent implements OnInit {
   friends$: Observable<Friend[]> = this.friendsStore.pipe(
-    select(selectFriends),
-    tap((friends) => console.log(friends))
+    select(selectFriends)
   );
   constructor(private friendsStore: Store<Friend[]>) {}
 
