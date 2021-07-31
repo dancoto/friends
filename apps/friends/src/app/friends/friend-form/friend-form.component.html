@@ -1,0 +1,21 @@
+<form [formGroup]="form">
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Friends</mat-label>
+    <input matInput formControlName="friends" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Age</mat-label>
+    <input matInput formControlName="age" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Weight</mat-label>
+    <input matInput formControlName="weight" />
+  </mat-form-field>
+  <button type="button" mat-button color="primary" (click)="add()">
+    Add Friend
+  </button>
+</form>

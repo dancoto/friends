@@ -33,6 +33,9 @@
     "friends-e2e": {
       "tags": [],
       "implicitDependencies": ["friends"]
+    },
+    "types": {
+      "tags": []
     }
   }
 }

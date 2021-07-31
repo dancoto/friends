@@ -1,0 +1,12 @@
+<dancoto-friend-form (addFriend)="addFriend($event)"></dancoto-friend-form>
+<div *ngFor="let friend of friends$ | async">
+  <ul>
+    <li>Name: {{ friend.name }}</li>
+    <li>Friends: {{ friend.friends }}</li>
+    <li>Age: {{ friend.age }}</li>
+    <li>Weight: {{ friend.weight }}</li>
+    <button mat-raised-button color="primary" (click)="deleteFriend(friend.id)">
+      Delete
+    </button>
+  </ul>
+</div>
