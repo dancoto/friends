@@ -15,8 +15,10 @@ import { NAME_PATTERN, NUMERIC_PATTERN } from '../../utils/regex-patterns';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FriendFormComponent {
-  form: FormGroup;
   @Output() readonly addFriend: EventEmitter<Friend> = new EventEmitter();
+
+  form: FormGroup;
+
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       name: [null, [Validators.required, Validators.pattern(NAME_PATTERN)]],
@@ -43,7 +45,7 @@ export class FriendFormComponent {
   add() {
     if (this.form.valid) {
       this.addFriend.emit(this.form.value);
-      this.form.reset();
+      this.clear();
     }
   }
 
