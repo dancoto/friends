@@ -1,21 +1,30 @@
-<form [formGroup]="form">
-  <mat-form-field>
-    <mat-label>Name</mat-label>
-    <input matInput formControlName="name" />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Friends</mat-label>
-    <input matInput formControlName="friends" />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Age</mat-label>
-    <input matInput formControlName="age" />
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Weight</mat-label>
-    <input matInput formControlName="weight" />
-  </mat-form-field>
-  <button type="button" mat-button color="primary" (click)="add()">
-    Add Friend
-  </button>
-</form>
+<mat-card class="form-card">
+  <h2>Add a friend here!</h2>
+  <form [formGroup]="form">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" />
+      <mat-error>A valid name is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Friends</mat-label>
+      <input matInput formControlName="friends" />
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Age</mat-label>
+      <input matInput formControlName="age" />
+      <mat-error>Age must be greater than 1</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Weight (in pounds)</mat-label>
+      <input matInput formControlName="weight" />
+      <mat-error>Weight must be greater than 1</mat-error>
+    </mat-form-field>
+    <span class="submission">
+      <button type="button" mat-flat-button (click)="clear()">Clear</button>
+      <button type="button" mat-flat-button color="primary" (click)="add()">
+        Add Friend
+      </button>
+    </span>
+  </form>
+</mat-card>

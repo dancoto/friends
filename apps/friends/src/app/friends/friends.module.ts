@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
@@ -22,6 +23,7 @@ import { friendsReducer } from './store/friends.reducer';
     FormsModule,
     MatButtonModule,
     ReactiveFormsModule,
+    MatCardModule,
     // Making these features for modularity
     StoreModule.forFeature('friends', friendsReducer),
     EffectsModule.forFeature([FriendsEffects]),

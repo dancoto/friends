@@ -2,11 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  OnInit,
   Output,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Friend } from '@dancoto/types';
+import { NAME_PATTERN, NUMERIC_PATTERN } from '../../utils/regex-patterns';
 
 @Component({
   selector: 'dancoto-friend-form',
@@ -14,18 +14,18 @@ import { Friend } from '@dancoto/types';
   styleUrls: ['./friend-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FriendFormComponent implements OnInit {
+export class FriendFormComponent {
   form: FormGroup;
   @Output() readonly addFriend: EventEmitter<Friend> = new EventEmitter();
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      name: [null, [Validators.required, Validators.pattern("^[a-zA-Z'-]+$")]],
+      name: [null, [Validators.required, Validators.pattern(NAME_PATTERN)]],
       friends: [null],
       age: [
         null,
         [
           Validators.required,
-          Validators.pattern('^[0-9]*$'),
+          Validators.pattern(NUMERIC_PATTERN),
           Validators.min(1),
         ],
       ],
@@ -33,19 +33,21 @@ export class FriendFormComponent implements OnInit {
         null,
         [
           Validators.required,
-          Validators.pattern('^[0-9]*$'),
+          Validators.pattern(NUMERIC_PATTERN),
           Validators.min(1),
         ],
       ],
     });
   }
 
-  ngOnInit(): void {}
-
   add() {
     if (this.form.valid) {
       this.addFriend.emit(this.form.value);
       this.form.reset();
     }
+  }
+
+  clear() {
+    this.form.reset();
   }
 }

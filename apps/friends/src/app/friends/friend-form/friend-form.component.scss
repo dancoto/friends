@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  justify-content: center;
+  .form-card {
+    max-width: 470px;
+  }
+  mat-form-field {
+    padding-right: 30px;
+  }
+  .submission {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
