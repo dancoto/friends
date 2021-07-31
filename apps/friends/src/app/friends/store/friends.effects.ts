@@ -16,7 +16,8 @@ import {
 } from './friends.actions';
 @Injectable()
 export class FriendsEffects {
-  // Though we have no API here, simulating a fetch fresh in case we had something stored server side
+  // Though we have no API here, simulating a fresh fetch in case we had something stored server side
+
   fetchFriends$ = createEffect(() =>
     this.actions$.pipe(
       ofType(fetchFriends),
