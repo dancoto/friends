@@ -22,7 +22,14 @@ export class FriendFormComponent {
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       name: [null, [Validators.required, Validators.pattern(NAME_PATTERN)]],
-      friends: [null],
+      friends: [
+        null,
+        [
+          Validators.required,
+          Validators.pattern(NUMERIC_PATTERN),
+          Validators.min(0),
+        ],
+      ],
       age: [
         null,
         [
