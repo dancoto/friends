@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   Input,
@@ -25,6 +26,7 @@ import {
   selector: 'dancoto-scatter-plot',
   templateUrl: './scatter-plot.component.html',
   styleUrls: ['./scatter-plot.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScatterPlotComponent
   implements OnInit, OnDestroy, OnChanges, AfterViewInit

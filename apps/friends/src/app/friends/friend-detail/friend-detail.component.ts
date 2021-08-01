@@ -23,4 +23,6 @@ export class FriendDetailComponent {
     new EventEmitter();
   @Output() readonly friendDetailYAxisChange: EventEmitter<AxisOptions> =
     new EventEmitter();
+  @Output() readonly friendDetailManageFriends: EventEmitter<void> =
+    new EventEmitter();
 }

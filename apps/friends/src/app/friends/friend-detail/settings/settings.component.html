@@ -1,6 +1,6 @@
 <mat-card>
   Comparing
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="fill" class="axis">
     <mat-label>X Axis</mat-label>
     <mat-select
       [value]="xAxis"
@@ -12,7 +12,7 @@
     </mat-select>
   </mat-form-field>
   vs.
-  <mat-form-field appearance="fill">
+  <mat-form-field appearance="fill" class="axis">
     <mat-label>Y Axis</mat-label>
     <mat-select
       [value]="yAxis"
@@ -24,4 +24,13 @@
     </mat-select>
   </mat-form-field>
   For {{ count > 1 ? count + ' friends' : count + ' friend' }}
+  <span class="spacer"></span>
+  <button
+    type="button"
+    mat-flat-button
+    color="primary"
+    (click)="settingsManageFriends.emit()"
+  >
+    Manage Friends
+  </button>
 </mat-card>

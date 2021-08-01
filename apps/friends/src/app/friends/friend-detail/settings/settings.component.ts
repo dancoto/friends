@@ -20,5 +20,7 @@ export class SettingsComponent {
     new EventEmitter();
   @Output() readonly settingsYAxisChanged: EventEmitter<AxisOptions> =
     new EventEmitter();
+  @Output() readonly settingsManageFriends: EventEmitter<void> =
+    new EventEmitter();
   options = CHART_AXIS_OPTIONS;
 }

@@ -1,0 +1,20 @@
+:host {
+  mat-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .spacer {
+    display: flex;
+    flex: 1;
+  }
+
+  .axis {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .manage-button {
+    margin-top: 40px;
+  }
+}

@@ -3,6 +3,7 @@
     [xAxis]="xAxis"
     [yAxis]="yAxis"
     [count]="friends.length"
+    (settingsManageFriends)="friendDetailManageFriends.emit()"
     (settingsXAxisChanged)="friendDetailXAxisChange.emit($event)"
     (settingsYAxisChanged)="friendDetailYAxisChange.emit($event)"
   ></dancoto-settings>

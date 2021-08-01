@@ -1,0 +1,13 @@
+:host {
+  min-width: 400px;
+  min-height: 400px;
+
+  .mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .no-friends {
+    text-align: center;
+  }
+}
