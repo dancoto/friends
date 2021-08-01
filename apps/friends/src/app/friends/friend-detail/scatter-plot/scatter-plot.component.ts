@@ -130,6 +130,7 @@ export class ScatterPlotComponent
     // based on the SVG above, we will be adding our data and axis to chart
     const chart = svg
       .append('g')
+      .attr('id', 'main-chart')
       .attr('transform', `translate(${this.margins.left},${this.margins.top})`);
 
     this.setScaleBasedOnData();
@@ -207,9 +208,8 @@ export class ScatterPlotComponent
       .range([0, this.innerWidth()])
       .domain([
         0,
-        d3.max(
-          this.data,
-          (d) => d[this.xAxis] * DATA_BUFFER_MULTIPLIER
+        d3.max(this.data, (d) =>
+          Math.ceil(d[this.xAxis] * DATA_BUFFER_MULTIPLIER)
         ) as number,
       ]);
 
@@ -217,9 +217,8 @@ export class ScatterPlotComponent
       .range([this.innerHeight(), 0])
       .domain([
         0,
-        d3.max(
-          this.data,
-          (d) => d[this.yAxis] * DATA_BUFFER_MULTIPLIER
+        d3.max(this.data, (d) =>
+          Math.ceil(d[this.yAxis] * DATA_BUFFER_MULTIPLIER)
         ) as number,
       ]);
   }
@@ -234,7 +233,6 @@ export class ScatterPlotComponent
    */
   private redrawElements() {
     const svg = d3.select(this.chartContainer?.nativeElement);
-
     // Translate the X axis
     svg
       .select<SVGGElement>('#x-axis')
@@ -280,13 +278,12 @@ export class ScatterPlotComponent
       )
       .attr('transform', 'rotate(-90)');
 
-    // select the circles so we can update the data
-    let circles = svg.selectAll('circle').data(this.data) as d3.Selection<
-      any,
-      Friend,
-      null,
-      undefined
-    >;
+    // select the circles inside the main chart so we can update the data
+    // Otherwise they may be rendered outside of the scope of the chart
+    let circles = d3
+      .select('#main-chart')
+      .selectAll('circle')
+      .data(this.data) as d3.Selection<any, Friend, null, undefined>;
 
     // Handle merging of old and new data to redraw points
     circles
@@ -300,6 +297,8 @@ export class ScatterPlotComponent
       .duration(TRANSITION_TIME)
       .attr('cx', (d) => this.xScale(d[this.xAxis]))
       .attr('cy', (d) => this.yScale(d[this.yAxis]));
+
+    circles.exit().remove();
   }
 
   /**
