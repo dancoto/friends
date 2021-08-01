@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ElementRef,
   Input,
@@ -19,7 +20,9 @@ import { AxisOptions } from '../friend-detail.constants';
   templateUrl: './scatter-plot.component.html',
   styleUrls: ['./scatter-plot.component.scss'],
 })
-export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
+export class ScatterPlotComponent
+  implements OnInit, OnDestroy, OnChanges, AfterViewInit
+{
   @Input() xAxis!: AxisOptions;
   @Input() yAxis!: AxisOptions;
   @Input() data!: Friend[];
@@ -40,12 +43,20 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     // If we are changing the axis, redraw the chart
-    if (changes.xAxis || changes.yAxis) {
+    if (
+      (changes.xAxis && !changes.xAxis.isFirstChange()) ||
+      (changes.yAxis && !changes.yAxis.isFirstChange())
+    ) {
       this.drawChart();
     } else {
       // Otherwise just update the data
       this.updateChart();
     }
+  }
+
+  ngAfterViewInit() {
+    // Redner initial chart after init so container has the correct dimensions to use
+    this.drawChart();
   }
 
   ngOnInit() {
@@ -106,8 +117,35 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
       .attr('transform', `translate(0,${this.innerHeight()})`)
       .call(d3.axisBottom(this.xScale)); // bottom: text will be shown below the line
 
+    chart
+      .append('text')
+      .attr('id', 'x-axis-label')
+      .attr(
+        'transform',
+        'translate(' +
+          this.innerWidth() / 2 +
+          ' ,' +
+          (this.innerHeight() + this.margin.top) +
+          ')'
+      )
+      .style('text-anchor', 'middle')
+      .style('text-transform', 'capitalize')
+      .text(this.xAxis);
+
     // Add in Y Axis
-    chart.append('g').attr('id', 'y-axis').call(d3.axisLeft(this.yScale)); // left: text will be shown left of the line
+    chart.append('g').attr('id', 'y-axis').call(d3.axisLeft(this.yScale));
+
+    // text label for the y axis
+    chart
+      .append('text')
+      .attr('id', 'y-axis-label')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - this.margin.left)
+      .attr('x', 0 - this.innerHeight() / 2)
+      .attr('dy', '1em')
+      .style('text-anchor', 'middle')
+      .style('text-transform', 'capitalize')
+      .text(this.yAxis);
 
     // Add data in
     chart
@@ -117,8 +155,8 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
       .append('circle')
       .attr('cx', (d) => this.xScale(d[this.xAxis]))
       .attr('cy', (d) => this.yScale(d[this.yAxis]))
-      .attr('r', 2)
-      .attr('fill', 'dimgray');
+      .attr('r', 3)
+      .attr('fill', '#6A1B9A');
   }
 
   /**
@@ -179,6 +217,8 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
 
   private redrawElements(newData: boolean = false) {
     const svg = d3.select(this.chartContainer?.nativeElement);
+
+    // Translate the X axis
     svg
       .select<SVGGElement>('#x-axis')
       .transition()
@@ -187,6 +227,20 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
       .attr('transform', `translate(0,${this.innerHeight()})`)
       .call(d3.axisBottom(this.xScale));
 
+    // Translate the X-Axis label
+    svg
+      .select<SVGGElement>('#x-axis-label')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(500)
+      .attr(
+        'transform',
+        `translate(
+          ${this.innerWidth() / 2}
+          ,
+          ${this.innerHeight() + this.margin.top})`
+      );
+
     // Adjust the Y axis accordingly
     svg
       .select<SVGGElement>('#y-axis')
@@ -194,6 +248,20 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
       .ease(d3.easePolyInOut)
       .duration(500)
       .call(d3.axisLeft(this.yScale));
+
+    svg
+      .select<SVGGElement>('#y-axis-label')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(500)
+      .attr(
+        'transform',
+        `translate(
+          ${this.innerHeight() + this.margin.top}
+          ,
+          ${this.margin.left})`
+      )
+      .attr('transform', 'rotate(-90)');
 
     if (newData) {
       svg.selectAll('circle').remove();
