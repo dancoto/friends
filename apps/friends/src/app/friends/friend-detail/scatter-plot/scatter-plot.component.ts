@@ -265,6 +265,14 @@ export class ScatterPlotComponent
       .duration(TRANSITION_TIME)
       .call(d3.axisLeft(this.yScale));
 
+    svg
+      .select<SVGGElement>('#y-axis-label')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(TRANSITION_TIME)
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - this.margins.left)
+      .attr('x', 0 - this.innerHeight() / 2);
     // select the circles inside the main chart so we can update the data
     // Otherwise they may be rendered outside of the scope of the chart
     let circles = d3
