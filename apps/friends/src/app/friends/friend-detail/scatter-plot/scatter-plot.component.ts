@@ -271,12 +271,11 @@ export class ScatterPlotComponent
       .duration(TRANSITION_TIME)
       .attr(
         'transform',
-        `translate(
-          ${this.innerHeight() + this.margins.top}
+        `translate(rotate(90),
+          ${this.margins.left}
           ,
-          ${this.margins.left})`
-      )
-      .attr('transform', 'rotate(-90)');
+          ${this.innerHeight() + this.margins.top}, rotate(-90))`
+      );
 
     // select the circles inside the main chart so we can update the data
     // Otherwise they may be rendered outside of the scope of the chart

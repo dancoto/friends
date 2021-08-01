@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { MatCardModule } from '@angular/material/card';
+import { MatSelectModule } from '@angular/material/select';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { SettingsComponent } from './settings.component';
 
 describe('SettingsComponent', () => {
@@ -8,9 +10,9 @@ describe('SettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SettingsComponent ]
-    })
-    .compileComponents();
+      declarations: [SettingsComponent],
+      imports: [MatSelectModule, MatCardModule, NoopAnimationsModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {
