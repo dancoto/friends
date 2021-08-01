@@ -37,30 +37,50 @@ export class ScatterPlotComponent
 
   constructor() {}
 
+  /**
+   * If axis is changing after initial load, fuly redraw the chart
+   * Otherwise just update the chart with new dimensions and data
+   *
+   * @param {SimpleChanges} changes
+   * @memberof ScatterPlotComponent
+   */
   ngOnChanges(changes: SimpleChanges) {
-    // If we are changing the axis, redraw the chart
     if (
       (changes.xAxis && !changes.xAxis.isFirstChange()) ||
       (changes.yAxis && !changes.yAxis.isFirstChange())
     ) {
       this.drawChart();
     } else {
-      // Otherwise just update the data
       this.updateChart();
     }
   }
 
+  /**
+   * Render the initial chart after the container is loaded
+   * to get the correct height and width
+   *
+   * @memberof ScatterPlotComponent
+   */
   ngAfterViewInit() {
-    // Redner initial chart after init so container has the correct dimensions to use
     this.drawChart();
   }
 
+  /**
+   * Set the x and y scales and setup listener on resize
+   *
+   * @memberof ScatterPlotComponent
+   */
   ngOnInit() {
     this.xScale = d3.scaleLinear();
     this.yScale = d3.scaleLinear();
     this.setResizeListener();
   }
 
+  /**
+   * Clear the resize subscription if its not closed
+   *
+   * @memberof ScatterPlotComponent
+   */
   ngOnDestroy() {
     if (!this.resizeSubscription.closed) {
       this.resizeSubscription.unsubscribe();
@@ -169,17 +189,37 @@ export class ScatterPlotComponent
     );
   }
 
+  /**
+   * Set the scale for screen size and data range for X and Y
+   *
+   * @private
+   * @memberof ScatterPlotComponent
+   */
   private setScaleBasedOnData() {
-    // set the scale for screen size and data range for X and Y
+    const BUFFER_MULTIPLIER = 1.2; // Setting this as a buffer to have some space for large values
     this.xScale
       .range([0, this.innerWidth()])
-      .domain([0, d3.max(this.data, (d) => d[this.xAxis] * 1.1) as number]);
+      .domain([
+        0,
+        d3.max(this.data, (d) => d[this.xAxis] * BUFFER_MULTIPLIER) as number,
+      ]);
 
     this.yScale
       .range([this.innerHeight(), 0])
-      .domain([0, d3.max(this.data, (d) => d[this.yAxis] * 1.1) as number]);
+      .domain([
+        0,
+        d3.max(this.data, (d) => d[this.yAxis] * BUFFER_MULTIPLIER) as number,
+      ]);
   }
 
+  /**
+   * Redraw the chart using current axis
+   * Adjusts the values to screen size and new values coming in for the same
+   * data set
+   *
+   * @private
+   * @memberof ScatterPlotComponent
+   */
   private redrawElements() {
     const svg = d3.select(this.chartContainer?.nativeElement);
 
