@@ -39,9 +39,11 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    // If we are changing the axis, redraw the chart
     if (changes.xAxis || changes.yAxis) {
       this.drawChart();
     } else {
+      // Otherwise just update the data
       this.updateChart();
     }
   }
@@ -88,6 +90,7 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
   private drawChart() {
     // Get the main SVG
     const svg = d3.select(this.chartContainer?.nativeElement);
+    svg.selectAll('*').remove();
 
     // based on the SVG above, we will be adding our data and axis to chart
     const chart = svg
@@ -193,15 +196,19 @@ export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
       .call(d3.axisLeft(this.yScale));
 
     if (newData) {
+      svg.selectAll('circle').remove();
       svg
         .selectAll('circle')
         .data(this.data)
         .enter()
+        .append('circle')
         .transition()
         .ease(d3.easePolyInOut)
         .duration(500)
-        .attr('cx', (d: any) => this.xScale(d[this.xAxis]))
-        .attr('cy', (d: any) => this.yScale(d[this.yAxis]));
+        .attr('cx', (d) => this.xScale(d[this.xAxis]))
+        .attr('cy', (d) => this.yScale(d[this.yAxis]))
+        .attr('r', 2)
+        .attr('fill', 'dimgray');
     } else {
       svg
         .selectAll('circle')
