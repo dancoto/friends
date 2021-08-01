@@ -7,7 +7,7 @@ import { AxisOptions } from './friend-detail/friend-detail.constants';
 import { ManageFriendsComponent } from './manage-friends/manage-friends.component';
 import { setXAxis, setYAxis } from './store/chart.actions';
 import { selectChartXAxis, selectChartYAxis } from './store/chart.selectors';
-import { addFriend, deleteFriend, fetchFriends } from './store/friends.actions';
+import { addFriend, fetchFriends } from './store/friends.actions';
 import { selectFriends } from './store/friends.selectors';
 import { FriendsFeatureState } from './store/reducers';
 
@@ -35,10 +35,6 @@ export class FriendsContainerComponent implements OnInit {
 
   addFriend(friend: Friend) {
     this.friendsStore.dispatch(addFriend({ friend }));
-  }
-
-  deleteFriendById(id: string) {
-    this.friendsStore.dispatch(deleteFriend({ id }));
   }
 
   changeXAxis(xAxis: AxisOptions) {
