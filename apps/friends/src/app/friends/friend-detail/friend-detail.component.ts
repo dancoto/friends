@@ -1,12 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
+  EventEmitter,
   Input,
+  Output,
 } from '@angular/core';
 import { Friend } from '@dancoto/types';
-import { Subscription } from 'rxjs';
-import { AxisOptions, CHART_AXIS_OPTIONS } from './friend-detail.constants';
+import { AxisOptions } from './friend-detail.constants';
 
 @Component({
   selector: 'dancoto-friend-detail',
@@ -15,10 +15,12 @@ import { AxisOptions, CHART_AXIS_OPTIONS } from './friend-detail.constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FriendDetailComponent {
-  @Input() friends: Friend[] = [];
-  xAxis: AxisOptions = 'age';
-  yAxis: AxisOptions = 'weight';
-  options = CHART_AXIS_OPTIONS;
-  subscriptions: Subscription[] = [];
-  constructor(public element: ElementRef<HTMLElement>) {}
+  @Input() friends!: Friend[];
+  @Input() xAxis!: AxisOptions;
+  @Input() yAxis!: AxisOptions;
+
+  @Output() readonly friendDetailXAxisChange: EventEmitter<AxisOptions> =
+    new EventEmitter();
+  @Output() readonly friendDetailYAxisChange: EventEmitter<AxisOptions> =
+    new EventEmitter();
 }

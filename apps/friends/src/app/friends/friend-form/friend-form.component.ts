@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
+  OnInit,
   Output,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -14,12 +15,12 @@ import { NAME_PATTERN, NUMERIC_PATTERN } from '../../utils/regex-patterns';
   styleUrls: ['./friend-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FriendFormComponent {
+export class FriendFormComponent implements OnInit {
   @Output() readonly addFriend: EventEmitter<Friend> = new EventEmitter();
 
-  form: FormGroup;
-
-  constructor(private fb: FormBuilder) {
+  form!: FormGroup;
+  constructor(private fb: FormBuilder) {}
+  ngOnInit() {
     this.form = this.fb.group({
       name: [null, [Validators.required, Validators.pattern(NAME_PATTERN)]],
       friends: [

@@ -5,8 +5,6 @@ import {
   deleteFriendSuccess,
   fetchFriendsSuccess,
 } from './friends.actions';
-// Ideally if this feature had more, we would have a proper feature object for more
-// properties in here, but since just friends, leaving it as an array
 export const initialState: Friend[] = [];
 
 const _friendsReducer = createReducer(
@@ -18,6 +16,9 @@ const _friendsReducer = createReducer(
   )
 );
 
-export function friendsReducer(state: Friend[], action: Action) {
+export function friendsReducer(
+  state: Friend[] | undefined,
+  action: Action
+): Friend[] {
   return _friendsReducer(state, action);
 }

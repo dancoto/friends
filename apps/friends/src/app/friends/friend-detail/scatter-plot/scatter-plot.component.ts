@@ -15,17 +15,16 @@ import { AxisOptions } from '../friend-detail.constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScatterPlotComponent implements OnChanges {
-  @Input() friends: Friend[] = [];
+  @Input() friends!: Friend[];
   @Input() margin = { top: 10, right: 30, bottom: 30, left: 60 };
-  @Input() xAxis: AxisOptions = 'age';
-  @Input() yAxis: AxisOptions = 'weight';
+  @Input() xAxis!: AxisOptions;
+  @Input() yAxis!: AxisOptions;
 
   maxLimitBuffer: number = 10;
   height: number = 400;
   width: number = 800;
   svg!: d3.Selection<SVGGElement, unknown, HTMLElement, undefined>;
   tooltip!: d3.Selection<HTMLDivElement, unknown, HTMLElement, undefined>;
-  constructor() {}
 
   ngOnChanges(changes: SimpleChanges) {
     // If incoming data changes, redraw

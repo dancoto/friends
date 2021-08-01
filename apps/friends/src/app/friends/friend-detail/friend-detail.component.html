@@ -1,23 +1,10 @@
 <ng-container *ngIf="friends?.length">
-  <mat-form-field appearance="fill">
-    <mat-label>X Axis</mat-label>
-    <mat-select [(value)]="xAxis">
-      <mat-option></mat-option>
-      <mat-option [value]="option.value" *ngFor="let option of options">{{
-        option.viewValue
-      }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field appearance="fill">
-    <mat-label>Y Axis</mat-label>
-    <mat-select [(value)]="yAxis">
-      <mat-option></mat-option>
-      <mat-option [value]="option.value" *ngFor="let option of options">{{
-        option.viewValue
-      }}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <dancoto-settings
+    [xAxis]="xAxis"
+    [yAxis]="yAxis"
+    (settingsXAxisChanged)="friendDetailXAxisChange.emit($event)"
+    (settingsYAxisChanged)="friendDetailYAxisChange.emit($event)"
+  ></dancoto-settings>
   <dancoto-scatter-plot
     [xAxis]="xAxis"
     [yAxis]="yAxis"

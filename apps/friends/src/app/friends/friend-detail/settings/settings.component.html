@@ -1,0 +1,25 @@
+<mat-card>
+  <mat-form-field appearance="fill">
+    <mat-label>X Axis</mat-label>
+    <mat-select
+      [value]="xAxis"
+      (selectionChange)="settingsXAxisChanged.emit($event.value)"
+    >
+      <mat-option [value]="option.value" *ngFor="let option of options">{{
+        option.viewValue
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Y Axis</mat-label>
+    <mat-select
+      [value]="yAxis"
+      (selectionChange)="settingsYAxisChanged.emit($event.value)"
+    >
+      <mat-option [value]="option.value" *ngFor="let option of options">{{
+        option.viewValue
+      }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-card>

@@ -1,3 +1,9 @@
 <dancoto-friend-form (addFriend)="addFriend($event)"></dancoto-friend-form>
 
-<dancoto-friend-detail [friends]="(friends$ | async)!"></dancoto-friend-detail>
+<dancoto-friend-detail
+  [friends]="(friends$ | async)!"
+  [xAxis]="(xAxis$ | async)!"
+  [yAxis]="(yAxis$ | async)!"
+  (friendDetailXAxisChange)="changeXAxis($event)"
+  (friendDetailYAxisChange)="changeYAxis($event)"
+></dancoto-friend-detail>

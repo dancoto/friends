@@ -1,4 +1,7 @@
-import { Friend } from '@dancoto/types';
-import { createFeatureSelector } from '@ngrx/store';
-
-export const selectFriends = createFeatureSelector<Friend[]>('friends');
+import { createSelector } from '@ngrx/store';
+import * as fromFriendsFeature from './reducers';
+import { selectFriendsFeature } from './selectors';
+export const selectFriends = createSelector(
+  selectFriendsFeature,
+  (state: fromFriendsFeature.FriendsFeatureState) => state.friends
+);
