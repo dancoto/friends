@@ -1,126 +1,144 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnChanges,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { Friend } from '@dancoto/types';
 import * as d3 from 'd3';
 import { AxisOptions } from '../friend-detail.constants';
+
 @Component({
   selector: 'dancoto-scatter-plot',
   templateUrl: './scatter-plot.component.html',
   styleUrls: ['./scatter-plot.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(window: resize)': 'onResize($event)' },
 })
-export class ScatterPlotComponent implements OnChanges {
-  @Input() friends!: Friend[];
-  @Input() margin = { top: 10, right: 30, bottom: 30, left: 60 };
+export class ScatterPlotComponent implements OnInit {
   @Input() xAxis!: AxisOptions;
   @Input() yAxis!: AxisOptions;
+  @Input() data!: Friend[];
+  // inject the svg element
+  @ViewChild('chart', { static: true })
+  private chartContainer?: ElementRef;
+  private margin: { top: number; bottom: number; left: number; right: number } =
+    { top: 30, bottom: 50, left: 50, right: 50 };
+  private readonly xScale: d3.ScaleLinear<number, number, never>;
+  private readonly yScale: d3.ScaleLinear<number, number, never>;
 
-  maxLimitBuffer: number = 10;
-  height: number = 400;
-  width: number = 800;
-  svg!: d3.Selection<SVGGElement, unknown, HTMLElement, undefined>;
-  tooltip!: d3.Selection<HTMLDivElement, unknown, HTMLElement, undefined>;
-
-  ngOnChanges(changes: SimpleChanges) {
-    // If incoming data changes, redraw
-    this.drawChart();
+  constructor() {
+    this.xScale = d3.scaleLinear();
+    this.yScale = d3.scaleLinear();
   }
 
-  private drawChart() {
-    d3.selectAll('#scatter-plot > *').remove();
-    this.renderChart();
-    this.updateAxisAndData();
+  ngOnInit(): void {
+    /*
+         First create a d3 selection for the svg element
+         that we added in the .html file
+       */
+    const svg = d3.select(this.chartContainer?.nativeElement);
+
+    /*
+          Then we append a group element inside the svg that will
+          then contain chart. We add a translation to respect the margin.
+          This margin is important because the text of the x- and y-axis
+          will go in the space it reserves.
+       */
+    const contentGroup = svg
+      .append('g')
+      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+    /*
+          Adjust X and Y scales to the currently available
+          screen area as well as to our data.
+       */
+    this.xScale
+      // adjust to the available screen area
+      .rangeRound([0, this.innerWidth()])
+      // adjust to the range of our data
+      .domain(
+        d3.extent<number>(this.data.map((d) => d[this.xAxis])) as number[]
+      );
+
+    this.yScale
+      // adjust to the available screen area
+      .rangeRound([this.innerHeight(), 0])
+      // adjust to the available screen area
+      .domain([0, d3.max(this.data, (d) => d[this.yAxis] * 1.1) as number]);
+
+    /*
+        Append X- and Y-Axis
+          x-axis:
+            The text of it will in the space that is reserved by our margin.
+            Move the axis to the bottom of the cart with a translation.
+       */
+    contentGroup
+      .append('g')
+      .attr('id', 'x-axis')
+      .attr('transform', `translate(0,${this.innerHeight()})`)
+      .call(d3.axisBottom(this.xScale)); // bottom: text will be shown below the line
+
+    contentGroup
+      .append('g')
+      .attr('id', 'y-axis')
+      .call(d3.axisLeft(this.yScale)); // left: text will be shown left of the line
+
+    /*
+          For each data element we add a circle to our chart
+       */
+    contentGroup
+      .selectAll('circle')
+      .data(this.data)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => this.xScale(d[this.xAxis]))
+      .attr('cy', (d) => this.yScale(d[this.yAxis]))
+      .attr('r', 2)
+      .attr('fill', 'dimgray');
   }
 
-  private renderChart() {
-    this.svg = d3
-      .select('#scatter-plot')
-      .append('svg')
-      .attr('preserveAspectRatio', 'xMinYMin meet')
-      .attr('viewBox', `0 0 ${this.width} ${this.height + 100}`)
-      .append('g')
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+  onResize(event: any) {
+    const svg = d3.select(this.chartContainer?.nativeElement);
+
+    // adapt the scale functions to the new dimensions
+    this.xScale.rangeRound([0, this.innerWidth()]);
+    this.yScale.rangeRound([this.innerHeight(), 0]);
+
+    // the a axis needs to use the new xScale and be moved to the right place.
+    svg
+      .select<SVGGElement>('#x-axis')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(500)
+      .attr('transform', `translate(0,${this.innerHeight()})`)
+      .call(d3.axisBottom(this.xScale));
+
+    // the y axis stays in place but needs to use the new yScale.
+    svg
+      .select<SVGGElement>('#y-axis')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(500)
+      .call(d3.axisLeft(this.yScale));
+
+    // reposition or circles
+    svg
+      .selectAll('circle')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(500)
+      .attr('cx', (d) => this.xScale((d as { x: number }).x))
+      .attr('cy', (d) => this.yScale((d as { y: number }).y));
   }
 
-  private updateAxisAndData() {
-    // Add X axis + scale to max buffer
-    const x = d3
-      .scaleLinear()
-      .domain([
-        0,
-        Math.max(...this.friends.map((friend) => friend[this.xAxis])) +
-          this.maxLimitBuffer,
-      ])
-      .range([0, this.width - 100]);
-    this.svg
-      .append('g')
-      .attr('transform', `translate(0, ${this.height})`)
-      .call(d3.axisBottom(x));
+  private innerWidth(): number {
+    return (
+      this.chartContainer?.nativeElement.clientWidth -
+      this.margin.left -
+      this.margin.right
+    );
+  }
 
-    // Add the label for the axis
-    this.svg
-      .append('text')
-      .attr('text-anchor', 'end')
-      .attr('x', this.width / 2)
-      .attr('y', this.height + 20)
-      .attr('class', 'capitalize')
-      .text(this.xAxis);
-
-    // Add Y axis + scale to max buffer
-    const y = d3
-      .scaleLinear()
-      .domain([
-        0,
-        Math.max(...this.friends.map((friend) => friend[this.yAxis])) +
-          this.maxLimitBuffer,
-      ])
-      .range([this.height, 0]);
-    this.svg.append('g').call(d3.axisLeft(y));
-
-    this.svg
-      .append('text')
-      .attr('text-anchor', 'end')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', -this.margin.left + 20)
-      .attr('x', -this.margin.top - this.height / 2 + 20)
-      .attr('class', 'capitalize')
-      .text(this.yAxis);
-
-    this.tooltip = d3
-      .select('#scatter-plot')
-      .append('div')
-      .style('opacity', 0)
-      .attr('class', 'tooltip')
-      .style('background-color', 'white')
-      .style('border', 'solid')
-      .style('border-width', '1px')
-      .style('border-radius', '5px')
-      .style('padding', '10px');
-
-    // Add Data
-    this.svg
-      .append('g')
-      .selectAll('dot')
-      .data(this.friends)
-      .join('circle')
-      .attr('cx', (d) => x(d[this.xAxis]))
-      .attr('cy', (d) => y(d[this.yAxis]))
-      .attr('r', 3)
-      .on('mouseover', (event, d) => {
-        this.tooltip.transition().duration(200).style('opacity', 0.9);
-        this.tooltip
-          .html(d.name)
-          .style('left', event.pageX + 'px')
-          .style('top', event.pageY - 28 + 'px');
-      })
-      .on('mouseout', (d) => {
-        this.tooltip.transition().duration(500).style('opacity', 0);
-      })
-      .style('fill', '#673AB7');
+  private innerHeight(): number {
+    return (
+      this.chartContainer?.nativeElement.clientHeight -
+      this.margin.top -
+      this.margin.bottom
+    );
   }
 }

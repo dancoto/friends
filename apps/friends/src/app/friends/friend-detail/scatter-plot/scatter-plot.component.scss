@@ -1,9 +1,8 @@
 :host {
-  ::ng-deep .capitalize {
-    text-transform: capitalize;
-  }
-
-  mat-card {
+  flex: 1;
+  display: flex;
+  .chart {
+    width: 100%;
     height: 100%;
   }
 }
