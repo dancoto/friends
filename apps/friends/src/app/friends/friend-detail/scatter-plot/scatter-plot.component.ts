@@ -1,21 +1,33 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { Friend } from '@dancoto/types';
 import * as d3 from 'd3';
+import { fromEvent, Observable, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AxisOptions } from '../friend-detail.constants';
 
 @Component({
   selector: 'dancoto-scatter-plot',
   templateUrl: './scatter-plot.component.html',
   styleUrls: ['./scatter-plot.component.scss'],
-  host: { '(window: resize)': 'onResize($event)' },
 })
-export class ScatterPlotComponent implements OnInit {
+export class ScatterPlotComponent implements OnInit, OnDestroy, OnChanges {
   @Input() xAxis!: AxisOptions;
   @Input() yAxis!: AxisOptions;
   @Input() data!: Friend[];
   // inject the svg element
   @ViewChild('chart', { static: true })
   private chartContainer?: ElementRef;
+  private resize$!: Observable<Event>;
+  private resizeSubscription!: Subscription;
   private margin: { top: number; bottom: number; left: number; right: number } =
     { top: 30, bottom: 50, left: 50, right: 50 };
   private readonly xScale: d3.ScaleLinear<number, number, never>;
@@ -26,62 +38,76 @@ export class ScatterPlotComponent implements OnInit {
     this.yScale = d3.scaleLinear();
   }
 
-  ngOnInit(): void {
-    /*
-         First create a d3 selection for the svg element
-         that we added in the .html file
-       */
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.xAxis || changes.yAxis) {
+      this.drawChart();
+    } else {
+      this.updateChart();
+    }
+  }
+
+  ngOnInit() {
+    this.setResizeListener();
+  }
+
+  ngOnDestroy() {
+    if (!this.resizeSubscription.closed) {
+      this.resizeSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Update the scales based on dimensions, then redraw elements
+   *
+   * @private
+   * @memberof ScatterPlotComponent
+   */
+  private onResize() {
+    this.xScale.range([0, this.innerWidth()]);
+    this.yScale.range([this.innerHeight(), 0]);
+    this.redrawElements();
+  }
+
+  /**
+   * Update the chart with incoming new data
+   *
+   * @private
+   * @memberof ScatterPlotComponent
+   */
+  private updateChart() {
+    this.setScaleBasedOnData();
+    this.redrawElements(true);
+  }
+
+  /**
+   * Draw the initial chart
+   *
+   * @private
+   * @memberof ScatterPlotComponent
+   */
+  private drawChart() {
+    // Get the main SVG
     const svg = d3.select(this.chartContainer?.nativeElement);
 
-    /*
-          Then we append a group element inside the svg that will
-          then contain chart. We add a translation to respect the margin.
-          This margin is important because the text of the x- and y-axis
-          will go in the space it reserves.
-       */
-    const contentGroup = svg
+    // based on the SVG above, we will be adding our data and axis to chart
+    const chart = svg
       .append('g')
       .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
 
-    /*
-          Adjust X and Y scales to the currently available
-          screen area as well as to our data.
-       */
-    this.xScale
-      // adjust to the available screen area
-      .rangeRound([0, this.innerWidth()])
-      // adjust to the range of our data
-      .domain(
-        d3.extent<number>(this.data.map((d) => d[this.xAxis])) as number[]
-      );
+    this.setScaleBasedOnData();
 
-    this.yScale
-      // adjust to the available screen area
-      .rangeRound([this.innerHeight(), 0])
-      // adjust to the available screen area
-      .domain([0, d3.max(this.data, (d) => d[this.yAxis] * 1.1) as number]);
-
-    /*
-        Append X- and Y-Axis
-          x-axis:
-            The text of it will in the space that is reserved by our margin.
-            Move the axis to the bottom of the cart with a translation.
-       */
-    contentGroup
+    // Add in X Axis
+    chart
       .append('g')
       .attr('id', 'x-axis')
       .attr('transform', `translate(0,${this.innerHeight()})`)
       .call(d3.axisBottom(this.xScale)); // bottom: text will be shown below the line
 
-    contentGroup
-      .append('g')
-      .attr('id', 'y-axis')
-      .call(d3.axisLeft(this.yScale)); // left: text will be shown left of the line
+    // Add in Y Axis
+    chart.append('g').attr('id', 'y-axis').call(d3.axisLeft(this.yScale)); // left: text will be shown left of the line
 
-    /*
-          For each data element we add a circle to our chart
-       */
-    contentGroup
+    // Add data in
+    chart
       .selectAll('circle')
       .data(this.data)
       .enter()
@@ -92,40 +118,14 @@ export class ScatterPlotComponent implements OnInit {
       .attr('fill', 'dimgray');
   }
 
-  onResize(event: any) {
-    const svg = d3.select(this.chartContainer?.nativeElement);
-
-    // adapt the scale functions to the new dimensions
-    this.xScale.rangeRound([0, this.innerWidth()]);
-    this.yScale.rangeRound([this.innerHeight(), 0]);
-
-    // the a axis needs to use the new xScale and be moved to the right place.
-    svg
-      .select<SVGGElement>('#x-axis')
-      .transition()
-      .ease(d3.easePolyInOut)
-      .duration(500)
-      .attr('transform', `translate(0,${this.innerHeight()})`)
-      .call(d3.axisBottom(this.xScale));
-
-    // the y axis stays in place but needs to use the new yScale.
-    svg
-      .select<SVGGElement>('#y-axis')
-      .transition()
-      .ease(d3.easePolyInOut)
-      .duration(500)
-      .call(d3.axisLeft(this.yScale));
-
-    // reposition or circles
-    svg
-      .selectAll('circle')
-      .transition()
-      .ease(d3.easePolyInOut)
-      .duration(500)
-      .attr('cx', (d) => this.xScale((d as { x: number }).x))
-      .attr('cy', (d) => this.yScale((d as { y: number }).y));
-  }
-
+  /**
+   * Calculate the current width of our chart based on the container
+   * and adjust for left and right margins
+   *
+   * @private
+   * @return {*}  {number}
+   * @memberof ScatterPlotComponent
+   */
   private innerWidth(): number {
     return (
       this.chartContainer?.nativeElement.clientWidth -
@@ -134,11 +134,83 @@ export class ScatterPlotComponent implements OnInit {
     );
   }
 
+  /**
+   * Calculate the current height of our chart based on the container
+   * and adjust for top and bottom margins
+   *
+   * @private
+   * @return {*}  {number}
+   * @memberof ScatterPlotComponent
+   */
   private innerHeight(): number {
     return (
       this.chartContainer?.nativeElement.clientHeight -
       this.margin.top -
       this.margin.bottom
     );
+  }
+
+  /**
+   * Set an observable to listen to resize events and add a debounce
+   *
+   * @private
+   * @memberof ScatterPlotComponent
+   */
+  private setResizeListener() {
+    this.resize$ = fromEvent(window, 'resize').pipe(debounceTime(200));
+    this.resizeSubscription = this.resize$.subscribe((event) =>
+      this.onResize()
+    );
+  }
+
+  private setScaleBasedOnData() {
+    // set the scale for screen size and data range for X and Y
+    this.xScale
+      .range([0, this.innerWidth()])
+      .domain([0, d3.max(this.data, (d) => d[this.xAxis] * 1.1) as number]);
+
+    this.yScale
+      .range([this.innerHeight(), 0])
+      .domain([0, d3.max(this.data, (d) => d[this.yAxis] * 1.1) as number]);
+  }
+
+  private redrawElements(newData: boolean = false) {
+    const svg = d3.select(this.chartContainer?.nativeElement);
+    svg
+      .select<SVGGElement>('#x-axis')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(500)
+      .attr('transform', `translate(0,${this.innerHeight()})`)
+      .call(d3.axisBottom(this.xScale));
+
+    // Adjust the Y axis accordingly
+    svg
+      .select<SVGGElement>('#y-axis')
+      .transition()
+      .ease(d3.easePolyInOut)
+      .duration(500)
+      .call(d3.axisLeft(this.yScale));
+
+    if (newData) {
+      svg
+        .selectAll('circle')
+        .data(this.data)
+        .enter()
+        .transition()
+        .ease(d3.easePolyInOut)
+        .duration(500)
+        .attr('cx', (d: any) => this.xScale(d[this.xAxis]))
+        .attr('cy', (d: any) => this.yScale(d[this.yAxis]));
+    } else {
+      svg
+        .selectAll('circle')
+        .transition()
+        .ease(d3.easePolyInOut)
+        .duration(500)
+        .attr('cx', (d: any) => this.xScale(d[this.xAxis]))
+        .attr('cy', (d: any) => this.yScale(d[this.yAxis]));
+    }
+    // Reposition the existing data
   }
 }
