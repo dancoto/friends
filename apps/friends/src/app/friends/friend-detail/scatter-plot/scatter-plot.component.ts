@@ -14,6 +14,12 @@ import * as d3 from 'd3';
 import { fromEvent, Observable, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { AxisOptions } from '../friend-detail.constants';
+import {
+  CHART_MARGINS,
+  DATA_BUFFER_MULTIPLIER,
+  RESIZE_DEBOUNCE_TIME,
+  TRANSITION_TIME,
+} from './scatter-plot.constants';
 
 @Component({
   selector: 'dancoto-scatter-plot',
@@ -32,8 +38,7 @@ export class ScatterPlotComponent
   private resizeSubscription!: Subscription;
   private xScale!: d3.ScaleLinear<number, number, never>;
   private yScale!: d3.ScaleLinear<number, number, never>;
-  private margin: { top: number; bottom: number; left: number; right: number } =
-    { top: 30, bottom: 50, left: 50, right: 50 };
+  private margins = CHART_MARGINS;
 
   constructor() {}
 
@@ -125,7 +130,7 @@ export class ScatterPlotComponent
     // based on the SVG above, we will be adding our data and axis to chart
     const chart = svg
       .append('g')
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+      .attr('transform', `translate(${this.margins.left},${this.margins.top})`);
 
     this.setScaleBasedOnData();
 
@@ -144,7 +149,7 @@ export class ScatterPlotComponent
         'translate(' +
           this.innerWidth() / 2 +
           ' ,' +
-          (this.innerHeight() + this.margin.top) +
+          (this.innerHeight() + this.margins.top) +
           ')'
       )
       .style('text-anchor', 'middle')
@@ -157,7 +162,7 @@ export class ScatterPlotComponent
       .append('text')
       .attr('id', 'y-axis-label')
       .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - this.margin.left)
+      .attr('y', 0 - this.margins.left)
       .attr('x', 0 - this.innerHeight() / 2)
       .attr('dy', '1em')
       .style('text-anchor', 'middle')
@@ -183,7 +188,9 @@ export class ScatterPlotComponent
    * @memberof ScatterPlotComponent
    */
   private setResizeListener() {
-    this.resize$ = fromEvent(window, 'resize').pipe(debounceTime(200));
+    this.resize$ = fromEvent(window, 'resize').pipe(
+      debounceTime(RESIZE_DEBOUNCE_TIME)
+    );
     this.resizeSubscription = this.resize$.subscribe((event) =>
       this.onResize()
     );
@@ -196,19 +203,24 @@ export class ScatterPlotComponent
    * @memberof ScatterPlotComponent
    */
   private setScaleBasedOnData() {
-    const BUFFER_MULTIPLIER = 1.2; // Setting this as a buffer to have some space for large values
     this.xScale
       .range([0, this.innerWidth()])
       .domain([
         0,
-        d3.max(this.data, (d) => d[this.xAxis] * BUFFER_MULTIPLIER) as number,
+        d3.max(
+          this.data,
+          (d) => d[this.xAxis] * DATA_BUFFER_MULTIPLIER
+        ) as number,
       ]);
 
     this.yScale
       .range([this.innerHeight(), 0])
       .domain([
         0,
-        d3.max(this.data, (d) => d[this.yAxis] * BUFFER_MULTIPLIER) as number,
+        d3.max(
+          this.data,
+          (d) => d[this.yAxis] * DATA_BUFFER_MULTIPLIER
+        ) as number,
       ]);
   }
 
@@ -228,7 +240,7 @@ export class ScatterPlotComponent
       .select<SVGGElement>('#x-axis')
       .transition()
       .ease(d3.easePolyInOut)
-      .duration(500)
+      .duration(TRANSITION_TIME)
       .attr('transform', `translate(0,${this.innerHeight()})`)
       .call(d3.axisBottom(this.xScale));
 
@@ -237,13 +249,13 @@ export class ScatterPlotComponent
       .select<SVGGElement>('#x-axis-label')
       .transition()
       .ease(d3.easePolyInOut)
-      .duration(500)
+      .duration(TRANSITION_TIME)
       .attr(
         'transform',
         `translate(
           ${this.innerWidth() / 2}
           ,
-          ${this.innerHeight() + this.margin.top})`
+          ${this.innerHeight() + this.margins.top})`
       );
 
     // Adjust the Y axis accordingly
@@ -251,20 +263,20 @@ export class ScatterPlotComponent
       .select<SVGGElement>('#y-axis')
       .transition()
       .ease(d3.easePolyInOut)
-      .duration(500)
+      .duration(TRANSITION_TIME)
       .call(d3.axisLeft(this.yScale));
 
     svg
       .select<SVGGElement>('#y-axis-label')
       .transition()
       .ease(d3.easePolyInOut)
-      .duration(500)
+      .duration(TRANSITION_TIME)
       .attr(
         'transform',
         `translate(
-          ${this.innerHeight() + this.margin.top}
+          ${this.innerHeight() + this.margins.top}
           ,
-          ${this.margin.left})`
+          ${this.margins.left})`
       )
       .attr('transform', 'rotate(-90)');
 
@@ -285,7 +297,7 @@ export class ScatterPlotComponent
       .merge(circles)
       .transition()
       .ease(d3.easePolyInOut)
-      .duration(500)
+      .duration(TRANSITION_TIME)
       .attr('cx', (d) => this.xScale(d[this.xAxis]))
       .attr('cy', (d) => this.yScale(d[this.yAxis]));
   }
@@ -301,8 +313,8 @@ export class ScatterPlotComponent
   private innerWidth(): number {
     return (
       this.chartContainer?.nativeElement.clientWidth -
-      this.margin.left -
-      this.margin.right
+      this.margins.left -
+      this.margins.right
     );
   }
 
@@ -317,8 +329,8 @@ export class ScatterPlotComponent
   private innerHeight(): number {
     return (
       this.chartContainer?.nativeElement.clientHeight -
-      this.margin.top -
-      this.margin.bottom
+      this.margins.top -
+      this.margins.bottom
     );
   }
 }
