@@ -2,16 +2,14 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap } from 'rxjs/operators';
+import { showNotification } from '../../core/notifications/notifications.actions';
 import { FriendsService } from '../friends.service';
 import {
   addFriend,
-  addFriendError,
   addFriendSuccess,
   deleteFriend,
-  deleteFriendError,
   deleteFriendSuccess,
   fetchFriends,
-  fetchFriendsError,
   fetchFriendsSuccess,
 } from './friends.actions';
 @Injectable()
@@ -24,7 +22,9 @@ export class FriendsEffects {
       mergeMap(() =>
         this.friendsService.fetchFriends().pipe(
           map((friends) => fetchFriendsSuccess({ friends })),
-          catchError(() => of(fetchFriendsError()))
+          catchError(() =>
+            of(showNotification({ message: 'Error fetching friends' }))
+          )
         )
       )
     )
@@ -38,9 +38,11 @@ export class FriendsEffects {
           map((id) =>
             !!id
               ? addFriendSuccess({ friend: { ...friend, id } })
-              : addFriendError()
+              : showNotification({ message: 'Error adding friend' })
           ),
-          catchError(() => of(addFriendError()))
+          catchError(() =>
+            of(showNotification({ message: 'Error adding friend' }))
+          )
         )
       )
     )
@@ -52,9 +54,13 @@ export class FriendsEffects {
       mergeMap(({ id }) =>
         this.friendsService.deleteFriend(id).pipe(
           map((success) =>
-            success ? deleteFriendSuccess({ id }) : deleteFriendError()
+            success
+              ? deleteFriendSuccess({ id })
+              : showNotification({ message: 'Error deleting friend' })
           ),
-          catchError(() => of(deleteFriendError()))
+          catchError(() =>
+            of(showNotification({ message: 'Error deleting friend' }))
+          )
         )
       )
     )

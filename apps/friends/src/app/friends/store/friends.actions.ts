@@ -9,10 +9,6 @@ export const fetchFriendsSuccess = createAction(
   props<{ friends: Friend[] }>()
 );
 
-export const fetchFriendsError = createAction(
-  '[Friend /API] Fetch Friends Error'
-);
-
 /** ADD */
 export const addFriend = createAction(
   '[Friend] Add Friend',
@@ -24,8 +20,6 @@ export const addFriendSuccess = createAction(
   props<{ friend: Friend }>()
 );
 
-export const addFriendError = createAction('[Friend /API] Add Friend Error');
-
 /** DELETE */
 export const deleteFriend = createAction(
   '[Friend] Delete Friend',
@@ -35,8 +29,4 @@ export const deleteFriend = createAction(
 export const deleteFriendSuccess = createAction(
   '[Friend /API] Delete Friend Success',
   props<{ id: string }>()
-);
-
-export const deleteFriendError = createAction(
-  '[Friend /API] Delete Friend Error'
 );

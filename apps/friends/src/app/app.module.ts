@@ -14,7 +14,7 @@ import { FriendsModule } from './friends/friends.module';
   imports: [
     BrowserModule,
     CoreModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot({}),
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({
       maxAge: 25,

@@ -5,9 +5,7 @@
     [dataSource]="(friends$ | async)!"
     (manageFriendsTableDeleteFriend)="deleteFriendById($event)"
   ></dancoto-manage-friends-table>
-  <ng-template #elseBlock class="no-friends"
-    >Add friends to be able to manage</ng-template
-  >
+  <ng-template #elseBlock>Add friends to be able to manage</ng-template>
 </div>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close>Close</button>

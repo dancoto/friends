@@ -4,16 +4,14 @@ import { provideMockActions } from '@ngrx/effects/testing';
 import { Action } from '@ngrx/store';
 import { Observable, of, throwError } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
+import { showNotification } from '../../core/notifications/notifications.actions';
 import { FriendsService } from '../friends.service';
 import {
   addFriend,
-  addFriendError,
   addFriendSuccess,
   deleteFriend,
-  deleteFriendError,
   deleteFriendSuccess,
   fetchFriends,
-  fetchFriendsError,
   fetchFriendsSuccess,
 } from './friends.actions';
 import { FriendsEffects } from './friends.effects';
@@ -58,7 +56,9 @@ describe('FriendsEffects', () => {
       actions$ = of(fetchFriends);
 
       effects.fetchFriends$.subscribe((action) => {
-        expect(action).toEqual(fetchFriendsError());
+        expect(action).toEqual(
+          showNotification({ message: 'Error fetching friends' })
+        );
       });
       tick(200);
     }));
@@ -103,7 +103,9 @@ describe('FriendsEffects', () => {
       actions$ = of(addFriend({ friend }));
 
       effects.addFriend$.subscribe((action) => {
-        expect(action).toEqual(addFriendError());
+        expect(action).toEqual(
+          showNotification({ message: 'Error adding friend' })
+        );
       });
       tick(200);
     }));
@@ -126,7 +128,9 @@ describe('FriendsEffects', () => {
       actions$ = of(addFriend({ friend }));
 
       effects.addFriend$.subscribe((action) => {
-        expect(action).toEqual(addFriendError());
+        expect(action).toEqual(
+          showNotification({ message: 'Error adding friend' })
+        );
       });
       tick(200);
     }));
@@ -152,7 +156,9 @@ describe('FriendsEffects', () => {
       actions$ = of(deleteFriend({ id }));
 
       effects.deleteFriend$.subscribe((action) => {
-        expect(action).toEqual(deleteFriendError());
+        expect(action).toEqual(
+          showNotification({ message: 'Error deleting friend' })
+        );
       });
       tick(200);
     }));
@@ -170,7 +176,9 @@ describe('FriendsEffects', () => {
       actions$ = of(deleteFriend({ id }));
 
       effects.deleteFriend$.subscribe((action) => {
-        expect(action).toEqual(deleteFriendError());
+        expect(action).toEqual(
+          showNotification({ message: 'Error deleting friend' })
+        );
       });
       tick(200);
     }));
