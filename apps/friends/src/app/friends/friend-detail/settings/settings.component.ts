@@ -15,6 +15,7 @@ import { AxisOptions, CHART_AXIS_OPTIONS } from '../friend-detail.constants';
 export class SettingsComponent {
   @Input() xAxis!: AxisOptions;
   @Input() yAxis!: AxisOptions;
+  @Input() count!: number;
   @Output() readonly settingsXAxisChanged: EventEmitter<AxisOptions> =
     new EventEmitter();
   @Output() readonly settingsYAxisChanged: EventEmitter<AxisOptions> =

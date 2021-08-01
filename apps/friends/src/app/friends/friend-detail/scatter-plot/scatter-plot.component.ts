@@ -40,7 +40,10 @@ export class ScatterPlotComponent
   private yScale!: d3.ScaleLinear<number, number, never>;
   private margins = CHART_MARGINS;
 
-  constructor() {}
+  constructor() {
+    this.xScale = d3.scaleLinear();
+    this.yScale = d3.scaleLinear();
+  }
 
   /**
    * If axis is changing after initial load, fuly redraw the chart
@@ -76,8 +79,6 @@ export class ScatterPlotComponent
    * @memberof ScatterPlotComponent
    */
   ngOnInit() {
-    this.xScale = d3.scaleLinear();
-    this.yScale = d3.scaleLinear();
     this.setResizeListener();
   }
 
@@ -263,19 +264,6 @@ export class ScatterPlotComponent
       .ease(d3.easePolyInOut)
       .duration(TRANSITION_TIME)
       .call(d3.axisLeft(this.yScale));
-
-    svg
-      .select<SVGGElement>('#y-axis-label')
-      .transition()
-      .ease(d3.easePolyInOut)
-      .duration(TRANSITION_TIME)
-      .attr(
-        'transform',
-        `translate(rotate(90),
-          ${this.margins.left}
-          ,
-          ${this.innerHeight() + this.margins.top}, rotate(-90))`
-      );
 
     // select the circles inside the main chart so we can update the data
     // Otherwise they may be rendered outside of the scope of the chart

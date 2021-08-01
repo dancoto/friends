@@ -1,5 +1,5 @@
 <mat-card>
-  Chart Options
+  Comparing
   <mat-form-field appearance="fill">
     <mat-label>X Axis</mat-label>
     <mat-select
@@ -11,7 +11,7 @@
       }}</mat-option>
     </mat-select>
   </mat-form-field>
-
+  vs.
   <mat-form-field appearance="fill">
     <mat-label>Y Axis</mat-label>
     <mat-select
@@ -23,4 +23,5 @@
       }}</mat-option>
     </mat-select>
   </mat-form-field>
+  For {{ count > 1 ? count + ' friends' : count + ' friend' }}
 </mat-card>
