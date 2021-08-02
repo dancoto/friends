@@ -41,6 +41,7 @@ export class ScatterPlotComponent
   private xScale!: d3.ScaleLinear<number, number, never>;
   private yScale!: d3.ScaleLinear<number, number, never>;
   private margins = CHART_MARGINS;
+  private initialChartDrawn: boolean = false;
 
   constructor() {
     this.xScale = d3.scaleLinear();
@@ -60,7 +61,7 @@ export class ScatterPlotComponent
       (changes.yAxis && !changes.yAxis.isFirstChange())
     ) {
       this.drawChart();
-    } else {
+    } else if (this.initialChartDrawn) {
       this.updateChart();
     }
   }
@@ -73,6 +74,7 @@ export class ScatterPlotComponent
    */
   ngAfterViewInit() {
     this.drawChart();
+    this.initialChartDrawn = true;
   }
 
   /**
@@ -139,11 +141,19 @@ export class ScatterPlotComponent
     this.setScaleBasedOnData();
 
     // Add in X Axis
+    const xAxisTicks = this.xScale
+      .ticks()
+      .filter((tick) => Number.isInteger(tick));
     chart
       .append('g')
       .attr('id', 'x-axis')
       .attr('transform', `translate(0,${this.innerHeight()})`)
-      .call(d3.axisBottom(this.xScale)); // bottom: text will be shown below the line
+      .call(
+        d3
+          .axisBottom(this.xScale)
+          .tickValues(xAxisTicks)
+          .tickFormat(d3.format('d'))
+      );
 
     chart
       .append('text')
@@ -161,7 +171,18 @@ export class ScatterPlotComponent
       .text(this.xAxis);
 
     // Add in Y Axis
-    chart.append('g').attr('id', 'y-axis').call(d3.axisLeft(this.yScale));
+    const yAxisTicks = this.yScale
+      .ticks()
+      .filter((tick) => Number.isInteger(tick));
+    chart
+      .append('g')
+      .attr('id', 'y-axis')
+      .call(
+        d3
+          .axisLeft(this.yScale)
+          .tickValues(yAxisTicks)
+          .tickFormat(d3.format('d'))
+      );
     chart
       .append('text')
       .attr('id', 'y-axis-label')
@@ -237,13 +258,21 @@ export class ScatterPlotComponent
   private redrawElements() {
     const svg = d3.select(this.chartContainer?.nativeElement);
     // Translate the X axis
+    const xAxisTicks = this.xScale
+      .ticks()
+      .filter((tick) => Number.isInteger(tick));
     svg
       .select<SVGGElement>('#x-axis')
       .transition()
       .ease(d3.easePolyInOut)
       .duration(TRANSITION_TIME)
       .attr('transform', `translate(0,${this.innerHeight()})`)
-      .call(d3.axisBottom(this.xScale));
+      .call(
+        d3
+          .axisBottom(this.xScale)
+          .tickValues(xAxisTicks)
+          .tickFormat(d3.format('d'))
+      );
 
     // Translate the X-Axis label
     svg
@@ -260,12 +289,20 @@ export class ScatterPlotComponent
       );
 
     // Adjust the Y axis accordingly
+    const yAxisTicks = this.yScale
+      .ticks()
+      .filter((tick) => Number.isInteger(tick));
     svg
       .select<SVGGElement>('#y-axis')
       .transition()
       .ease(d3.easePolyInOut)
       .duration(TRANSITION_TIME)
-      .call(d3.axisLeft(this.yScale));
+      .call(
+        d3
+          .axisLeft(this.yScale)
+          .tickValues(yAxisTicks)
+          .tickFormat(d3.format('d'))
+      );
 
     svg
       .select<SVGGElement>('#y-axis-label')
