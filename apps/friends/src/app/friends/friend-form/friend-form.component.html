@@ -9,16 +9,17 @@
     <mat-form-field appearance="fill">
       <mat-label>Friends</mat-label>
       <input matInput type="number" formControlName="friends" />
+      <mat-error>Friends must be number 0 or greater</mat-error>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Age</mat-label>
       <input matInput type="number" formControlName="age" />
-      <mat-error>Age must be greater than 1</mat-error>
+      <mat-error>Age must be a number greater than 1</mat-error>
     </mat-form-field>
     <mat-form-field appearance="fill">
       <mat-label>Weight (in pounds)</mat-label>
       <input matInput type="number" formControlName="weight" />
-      <mat-error>Weight must be greater than 1</mat-error>
+      <mat-error>Weight must be a number greater than 1</mat-error>
     </mat-form-field>
     <span class="submission">
       <button type="button" mat-flat-button (click)="clear()">Clear</button>

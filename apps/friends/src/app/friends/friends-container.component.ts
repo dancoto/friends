@@ -26,6 +26,11 @@ export class FriendsContainerComponent implements OnInit {
     private friendsStore: Store<FriendsFeatureState>
   ) {}
 
+  /**
+   * Setup selects from store and dispatch to fetch friends
+   *
+   * @memberof FriendsContainerComponent
+   */
   ngOnInit(): void {
     this.friends$ = this.friendsStore.pipe(select(selectFriends));
     this.xAxis$ = this.friendsStore.pipe(select(selectChartXAxis));
@@ -33,17 +38,41 @@ export class FriendsContainerComponent implements OnInit {
     this.friendsStore.dispatch(fetchFriends());
   }
 
+  /**
+   * Dispatch an addFriend to the store
+   *
+   * @param {Friend} friend
+   * @memberof FriendsContainerComponent
+   */
   addFriend(friend: Friend) {
     this.friendsStore.dispatch(addFriend({ friend }));
   }
 
+  /**
+   * Dispatch a setXAxis to the store
+   *
+   * @param {AxisOptions} xAxis
+   * @memberof FriendsContainerComponent
+   */
   changeXAxis(xAxis: AxisOptions) {
     this.friendsStore.dispatch(setXAxis({ xAxis }));
   }
+
+  /**
+   * Dispatch a setYAxis to the store
+   *
+   * @param {AxisOptions} yAxis
+   * @memberof FriendsContainerComponent
+   */
   changeYAxis(yAxis: AxisOptions) {
     this.friendsStore.dispatch(setYAxis({ yAxis }));
   }
 
+  /**
+   * Open a matDialog to be able to look at and delete friends
+   *
+   * @memberof FriendsContainerComponent
+   */
   manageFriends() {
     this.matDialog.open(ManageFriendsComponent, {
       minWidth: 600,

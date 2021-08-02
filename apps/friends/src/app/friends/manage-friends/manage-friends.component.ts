@@ -17,6 +17,12 @@ export class ManageFriendsComponent implements OnInit {
   friends$!: Observable<Friend[]>;
   constructor(private friendsStore: Store<FriendsFeatureState>) {}
 
+  /**
+   * Fetch friends form the store
+   * Share replay to not double fire by async pipe in template
+   *
+   * @memberof ManageFriendsComponent
+   */
   ngOnInit(): void {
     this.friends$ = this.friendsStore.pipe(
       select(selectFriends),
@@ -24,6 +30,12 @@ export class ManageFriendsComponent implements OnInit {
     );
   }
 
+  /**
+   * Dispatch action to delete friend by ID
+   *
+   * @param {string} id
+   * @memberof ManageFriendsComponent
+   */
   deleteFriendById(id: string) {
     this.friendsStore.dispatch(deleteFriend({ id }));
   }
